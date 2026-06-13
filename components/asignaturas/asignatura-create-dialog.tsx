@@ -112,7 +112,7 @@ export function AsignaturaCreateDialog({
                     type="button"
                     onClick={() => setSelectedColor(color)}
                     className={cn(
-                      "size-8 rounded-full transition-all",
+                      "size-8 rounded-full transition-all cursor-pointer",
                       selectedColor === color
                         ? "ring-2 ring-offset-2 ring-primary"
                         : "hover:scale-110"
@@ -128,10 +128,11 @@ export function AsignaturaCreateDialog({
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
+              className="cursor-pointer"
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={!nombre.trim() || loading}>
+            <Button type="submit" disabled={!nombre.trim() || loading} className="cursor-pointer">
               {loading ? "Creando..." : "Crear Asignatura"}
             </Button>
           </DialogFooter>

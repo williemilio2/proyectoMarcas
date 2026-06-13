@@ -72,7 +72,6 @@ export function UserProvider({
         )
 
         if (response.ok) {
-          console.log("Holaª");
           const data =
             await response.json()
 
@@ -92,7 +91,6 @@ export function UserProvider({
         }
 
       } catch {
-          console.log("Holasª");
 
         setUser(null)
 

@@ -43,8 +43,6 @@ export interface RecursoVisibilidad {
   roles: UserRole[] | null // null = todos pueden ver
 }
 
-// Tipo de recurso
-export type RecursoTipo = 'pdf' | 'imagen' | 'documento' | 'video' | 'otro'
 
 // Recurso
 export interface Recurso {
@@ -78,4 +76,36 @@ export interface UserContextType {
   currentGrupo: Grupo | null
   currentRole: UserRole | null
   setCurrentGrupo: (grupo: Grupo | null) => void
+}
+export interface Archivo {
+  id: number;
+  nombre: string;
+  url: string;
+  tipo: string;
+  asignatura_id: number;
+  id_alumno: number;
+  fecha_subida?: string;
+}
+
+export type RecursoTipo = "pdf" | "txt" | "doc" | "docx" | "jpg" | "jpeg" | "png" | "gif" | "xlsx" | "pptx" | "mp4" | "otro";
+
+export const FILE_TYPE_MAP: Record<string, RecursoTipo> = {
+  pdf: "pdf",
+  txt: "txt",
+  doc: "doc",
+  docx: "docx",
+  jpg: "jpg",
+  jpeg: "jpg",
+  png: "png",
+  gif: "gif",
+  xlsx: "xlsx",
+  xls: "xlsx",
+  pptx: "pptx",
+  ppt: "pptx",
+  mp4: "mp4",
+};
+
+export function getFileTipo(filename: string): RecursoTipo {
+  const ext = filename.split(".").pop()?.toLowerCase() ?? "";
+  return FILE_TYPE_MAP[ext] ?? "otro";
 }

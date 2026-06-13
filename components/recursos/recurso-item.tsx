@@ -1,104 +1,147 @@
-import { FileText, Image, Video, File, Download, Eye, Trash2, Lock } from 'lucide-react'
-
-import { usePermissions } from '@/hooks/use-permissions'
-import type { Recurso, UserRole } from '@/types'
-import { Button } from '@/components/ui/button'
-import { RoleBadge } from '@/components/shared/role-badge'
-import { cn } from '@/lib/utils'
+import { FileText, Image, Video, File, Download, Eye, Trash2, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { eliminarRecurso } from "@/lib/recursos";
+import { getFileTipo, type RecursoTipo } from "@/types";
+import type { Archivo } from "@/types";
+import { Button } from "@/components/ui/button";
+import {obtenerDatosPersona} from "@/src/actions/obtenerDatosPersona"
 
 interface RecursoItemProps {
-  recurso: Recurso
-  onView?: (recurso: Recurso) => void
-  onDownload?: (recurso: Recurso) => void
-  onDelete?: (recurso: Recurso) => void
+  archivo: Archivo;
+  currentUserId: number;
+  onDeleted: () => void;
+  puedeEliminar?: boolean;
 }
 
-const TIPO_ICONS: Record<string, React.ReactNode> = {
+const TIPO_ICONS: Record<RecursoTipo, React.ReactNode> = {
   pdf: <FileText className="size-5 text-red-500" />,
-  documento: <FileText className="size-5 text-blue-500" />,
-  imagen: <Image className="size-5 text-green-500" />,
-  video: <Video className="size-5 text-purple-500" />,
+  txt: <FileText className="size-5 text-gray-500" />,
+  doc: <FileText className="size-5 text-blue-500" />,
+  docx: <FileText className="size-5 text-blue-500" />,
+  jpg: <Image className="size-5 text-green-500" />,
+  jpeg: <Image className="size-5 text-green-500" />,
+  png: <Image className="size-5 text-green-500" />,
+  gif: <Image className="size-5 text-green-500" />,
+  xlsx: <FileText className="size-5 text-emerald-600" />,
+  pptx: <FileText className="size-5 text-orange-500" />,
+  mp4: <Video className="size-5 text-purple-500" />,
   otro: <File className="size-5 text-gray-500" />,
+};
+
+const TIPO_LABELS: Record<RecursoTipo, string> = {
+  pdf: "PDF",
+  txt: "Texto",
+  doc: "Word",
+  docx: "Word",
+  jpg: "Imagen",
+  jpeg: "Imagen",
+  png: "Imagen",
+  gif: "Imagen",
+  xlsx: "Excel",
+  pptx: "PowerPoint",
+  mp4: "Video",
+  otro: "Archivo",
+};
+
+function formatDate(dateStr?: string): string {
+  if (!dateStr) return "Fecha desconocida";
+
+  return new Date(dateStr).toLocaleDateString("es-ES", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
+export function RecursoItem({ archivo, currentUserId, onDeleted, puedeEliminar }: RecursoItemProps) {
+  const [deleting, setDeleting] = useState(false);
+  const [nombre, setNombre] = useState<string | null>(null);
+  const tipo = getFileTipo(archivo.nombre) as RecursoTipo;
+  const icon = TIPO_ICONS[tipo] ?? TIPO_ICONS.otro;
+  const canDelete = archivo.id_alumno === currentUserId ||puedeEliminar;
 
-function getVisibilityLabel(recurso: Recurso): string {
-  if (!recurso.visibilidad.roles) return 'Todos'
-  if (recurso.visibilidad.roles.includes('alumno')) return 'Todos'
-  if (recurso.visibilidad.roles.includes('profesor')) return 'Profesores'
-  return 'Admin'
-}
+  const handleView = () => {
+    window.open(archivo.url, "_blank");
+  };
+  useEffect(() => {
+    const cargarDatos = async () => {
+      const nombreObtenido = await obtenerDatosPersona(
+        archivo.id_alumno
+      );
+      setNombre(nombreObtenido);
+    };
 
-export function RecursoItem({
-  recurso,
-  onView,
-  onDownload,
-  onDelete,
-}: RecursoItemProps) {
-  const { canDeleteRecurso } = usePermissions()
-  const isRestricted = recurso.visibilidad.roles !== null
+    cargarDatos();
+    }, []);
+const handleDownload = async () => {
+  const response = await fetch(archivo.url);
+
+  if (!response.ok) {
+    throw new Error("No se pudo descargar el archivo");
+  }
+
+  const blob = await response.blob();
+
+  const objectUrl = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = objectUrl;
+  a.download = archivo.nombre;
+
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  URL.revokeObjectURL(objectUrl);
+};
+
+  const handleDelete = async () => {
+    if (!canDelete) return;
+    setDeleting(true);
+    await eliminarRecurso(archivo.id, currentUserId);
+    setDeleting(false);
+    onDeleted();
+  };
 
   return (
     <div className="group flex items-center gap-3 rounded-lg border bg-card p-3 transition-colors hover:bg-muted/50">
-      <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
-        {TIPO_ICONS[recurso.tipo] || TIPO_ICONS.otro}
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+        {icon}
       </div>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <p className="font-medium truncate">{recurso.nombre}</p>
-          {isRestricted && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900 dark:text-amber-200">
-              <Lock className="size-3" />
-              {getVisibilityLabel(recurso)}
-            </span>
-          )}
+        <p className="font-medium truncate text-sm">{archivo.nombre}</p>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+          <span>{TIPO_LABELS[tipo] ?? "Archivo"}</span>
+          <span className="text-zinc-300 dark:text-zinc-600">|</span>
+          <span>{formatDate(archivo.fecha_subida)}</span>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {formatFileSize(recurso.size)}
-        </p>
+        <div>
+          <p className="text-sm text-gray-500 italic">
+            {nombre}
+          </p>
+        </div>
       </div>
 
       <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-        {onView && (
+        <Button variant="ghost" size="icon" className="size-8 cursor-pointer" onClick={(handleView)}>
+          <Eye className="size-4" />
+        </Button>
+        <Button variant="ghost" size="icon" className="size-8 cursor-pointer" onClick={handleDownload}>
+          <Download className="size-4" />
+        </Button>
+        {canDelete && (
           <Button
             variant="ghost"
             size="icon"
-            className="size-8"
-            onClick={() => onView(recurso)}
+            className="size-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 cursor-pointer"
+            onClick={handleDelete}
+            disabled={deleting}
           >
-            <Eye className="size-4" />
-            <span className="sr-only">Ver</span>
-          </Button>
-        )}
-        {onDownload && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-8"
-            onClick={() => onDownload(recurso)}
-          >
-            <Download className="size-4" />
-            <span className="sr-only">Descargar</span>
-          </Button>
-        )}
-        {onDelete && canDeleteRecurso(recurso) && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-8 text-destructive hover:text-destructive"
-            onClick={() => onDelete(recurso)}
-          >
-            <Trash2 className="size-4" />
-            <span className="sr-only">Eliminar</span>
+            {deleting ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
           </Button>
         )}
       </div>
     </div>
-  )
+  );
 }

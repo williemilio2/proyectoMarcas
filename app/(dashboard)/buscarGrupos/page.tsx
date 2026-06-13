@@ -154,7 +154,7 @@ export default function BuscarGruposPage() {
                   <Button
                     onClick={() => handleUnirse(grupo.id)}
                     disabled={joiningGroup === grupo.id}
-                    className="w-full"
+                    className="w-full cursor-pointer"
                   >
                     {joiningGroup === grupo.id ? "Uniéndose..." : "Unirse al grupo"}
                   </Button>

@@ -7,7 +7,6 @@ export async function obtenerGrupoById(idGrupo: number) {
       sql: `SELECT * FROM grupos WHERE id = ?`,
       args: [idGrupo],
     });
-
     return JSON.parse(JSON.stringify(result.rows));
   } catch (error) {
     console.log(error);

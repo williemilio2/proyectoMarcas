@@ -20,7 +20,21 @@ async function cuentaExistente(correo: string)
         return result.rows[0]
     }
 }
-
+async function verVerificacion(id: number)
+{
+    const result = await db.execute({
+    sql: `
+        SELECT *
+        FROM usuarios_verificacion
+        WHERE id_usuario = ?
+    `,
+    args: [id],
+    });
+    if(result.rows[0] != null)
+    {
+        return result.rows[0]
+    }
+}
 export async function loginUser(
   email: string,
   password: string
@@ -28,6 +42,14 @@ export async function loginUser(
     var resultado = await cuentaExistente(email)
     if(resultado)
     {
+        const id = Number((resultado as any).id);
+        var resultadoVerificacion = await verVerificacion(id);
+        if (resultadoVerificacion && resultadoVerificacion.verificado !== 1) {
+            return {
+                success: false,
+                message: "Debes verificar tu correo antes de iniciar sesión",
+            };
+            }
         const validPassword =
         await bcrypt.compare(
             password,

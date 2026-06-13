@@ -180,12 +180,12 @@ export function MiembrosDialog({
                           onValueChange={(value) => handleRoleChange(miembro.id, value)}
                           disabled={loading === miembro.id}
                         >
-                          <SelectTrigger className="w-[140px]">
+                          <SelectTrigger className="w-[140px] cursor-pointer">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             {getAvailableRoles().map((rol) => (
-                              <SelectItem key={rol} value={rol.toString()}>
+                              <SelectItem key={rol} value={rol.toString()} className="cursor-pointer">
                                 {ROLE_NAMES[rol]}
                               </SelectItem>
                             ))}

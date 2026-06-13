@@ -5,14 +5,9 @@ export async function getUser() {
 
   const cookieStore = await cookies()
 
-console.log(
-  "ALL COOKIES:",
-  cookieStore.getAll()
-)
 
     const token =
       cookieStore.get("accountToken")?.value
-console.log("TOKEN:", token)
   if (!token) {
           console.log("No hay toqen");
     return null;

@@ -31,7 +31,7 @@ export default function DashboardPage() {
         </div> 
         <div className="flex gap-3">
           <GrupoCreateDialog>
-            <Button>
+            <Button className=' cursor-pointer'>
               <Plus className="mr-2 size-4" />
               Crear Grupo
             </Button>

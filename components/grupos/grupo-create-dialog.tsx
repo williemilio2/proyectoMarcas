@@ -50,6 +50,7 @@ export function GrupoCreateDialog({ children }: GrupoCreateDialogProps) {
           const data = await response.json()
           await createRolInGroup(data.user.id, result.grupoId, "Creador");
         }
+      window.location.href = "/";
       setOpen(false)
     }else {
         alert(result.message);
@@ -105,7 +106,7 @@ export function GrupoCreateDialog({ children }: GrupoCreateDialogProps) {
                     type="button"
                     onClick={() => setSelectedColor(color)}
                     className={cn(
-                      'size-8 rounded-full transition-all',
+                      'size-8 rounded-full transition-all cursor-pointer',
                       selectedColor === color
                         ? 'ring-2 ring-offset-2 ring-primary'
                         : 'hover:scale-110'
@@ -117,10 +118,10 @@ export function GrupoCreateDialog({ children }: GrupoCreateDialogProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} className='cursor-pointer'>
               Cancelar
             </Button>
-            <Button type="submit" disabled={!nombre.trim()}>
+            <Button type="submit" disabled={!nombre.trim()} className='cursor-pointer'>
               Crear Grupo
             </Button>
           </DialogFooter>

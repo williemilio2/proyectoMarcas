@@ -9,19 +9,18 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: 'Aulas - Plataforma Educativa',
   description: 'Plataforma educativa tipo Google Classroom para gestionar grupos, asignaturas, recursos y comunicacion',
-  generator: 'v0.app',
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
+        url: 'https://cdn-icons-png.flaticon.com/512/268/268112.png',
         media: '(prefers-color-scheme: light)',
       },
       {
-        url: '/icon-dark-32x32.png',
+        url: 'https://cdn-icons-png.flaticon.com/512/268/268112.png',
         media: '(prefers-color-scheme: dark)',
       },
       {
-        url: '/icon.svg',
+        url: 'https://cdn-icons-png.flaticon.com/512/268/268112.png',
         type: 'image/svg+xml',
       },
     ],

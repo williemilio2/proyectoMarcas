@@ -3,11 +3,19 @@
 import { use, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, ArrowLeft, Users } from "lucide-react";
+import {
+  Plus,
+  ArrowLeft,
+  Users,
+  Trash2,
+  LogOut
+} from "lucide-react";
 import { useUser } from "@/contexts/user-context";
 import { obtenerAsignaturas } from "@/src/actions/obtenerAsignaturas";
 import { obtenerRol } from "@/src/actions/obtenerRol";
 import { obtenerGrupoById } from "@/src/actions/obtenerGrupoById";
+import { eliminarGrupo } from "@/src/actions/eliminarGrupo";
+import { salirGrupo } from "@/src/actions/salirGrupo";
 import { AsignaturaList } from "@/components/asignaturas/asignatura-list";
 import { AsignaturaCreateDialog } from "@/components/asignaturas/asignatura-create-dialog";
 import { MiembrosDialog } from "@/components/miembros/miembros-dialog";
@@ -15,7 +23,17 @@ import { obtenerMiembrosGrupo } from "@/src/actions/obtenerMiembrosGrupo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ROLES } from "@/lib/constants";
-
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 interface GrupoPageProps {
   params: Promise<{ grupoId: string }>;
 }
@@ -52,6 +70,31 @@ export default function GrupoPage({ params }: GrupoPageProps) {
 
   const grupoIdNum = parseInt(grupoId, 10);
 
+  const salirGrupoFunc = async () => {
+    if(user && user.id)
+    {
+      const result = await salirGrupo(
+        grupoId,
+        user.id
+      );
+      if(result.success)
+      {
+        window.location.href = "/"
+      }
+      else{
+        alert(result.error)
+      }
+    }
+  }
+  const eliminarGrupoFunc = async () => {
+    const result = await eliminarGrupo(grupoId);
+
+    if (result.success) {
+      window.location.href = "/";
+    } else {
+      alert(result.error);
+    }
+  };
   const canCreate =
     userRole === ROLES.ADMINISTRADOR || userRole === ROLES.CREADOR;
 
@@ -87,16 +130,16 @@ export default function GrupoPage({ params }: GrupoPageProps) {
       setUserRole(toNumber(rolData));
 
       setGrupo(
-        grupoData
-          ? ({
-              id: Number((grupoData as any).id),
-              nombre: String((grupoData as any).nombre),
-              descripcion: (grupoData as any).descripcion
-                ? String((grupoData as any).descripcion)
-                : null,
-            } as Grupo)
-          : null
-      );
+        grupoData && grupoData.length > 0
+            ? ({
+                id: Number(grupoData[0].id),
+                nombre: String(grupoData[0].nombre),
+                descripcion: grupoData[0].descripcion
+                  ? String(grupoData[0].descripcion)
+                  : null,
+              } as Grupo)
+            : null
+        );
       setMiembros(miembrosData);
     } catch (error) {
       console.error("Error cargando datos:", error);
@@ -109,6 +152,7 @@ export default function GrupoPage({ params }: GrupoPageProps) {
     if (!userLoading && user) {
       cargarDatos();
     }
+    console.log(grupo)
   }, [userLoading, user, cargarDatos]);
 
   if (userLoading || loading) {
@@ -128,7 +172,7 @@ export default function GrupoPage({ params }: GrupoPageProps) {
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex items-center gap-4">
         <Link href="/">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="cursor-pointer">
             <ArrowLeft className="size-4" />
           </Button>
         </Link>
@@ -139,6 +183,97 @@ export default function GrupoPage({ params }: GrupoPageProps) {
             <p className="text-muted-foreground">{grupo.descripcion}</p>
           )}
         </div>
+<div className="ml-auto">
+  {userRole === ROLES.CREADOR ? (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="destructive"
+          size="sm"
+          className="cursor-pointer"
+        >
+          <Trash2 className="mr-2 size-4" />
+          Eliminar grupo
+        </Button>
+      </AlertDialogTrigger>
+
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            ¿Eliminar grupo?
+          </AlertDialogTitle>
+
+          <AlertDialogDescription>
+            Esta acción eliminará permanentemente:
+            <br />
+            <br />
+            • Todos los usuarios del grupo
+            <br />
+            • Todos los roles asignados
+            <br />
+            • Todas las asignaturas
+            <br />
+            • Todos los recursos y archivos
+            <br />
+            <br />
+            Esta acción no se puede deshacer.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <AlertDialogFooter>
+          <AlertDialogCancel className=" cursor-pointer">
+            Cancelar
+          </AlertDialogCancel>
+
+          <AlertDialogAction
+            onClick={eliminarGrupoFunc}
+            className="bg-red-600 hover:bg-red-700 cursor-pointer"
+          >
+            Eliminar grupo
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ) : (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="destructive"
+          size="sm"
+          className="cursor-pointer"
+        >
+          <LogOut className="mr-2 size-4" />
+          Salir del grupo
+        </Button>
+      </AlertDialogTrigger>
+
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            ¿Salir del grupo?
+          </AlertDialogTitle>
+
+          <AlertDialogDescription>
+            Perderás el acceso a las asignaturas y recursos de este grupo.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <AlertDialogFooter>
+          <AlertDialogCancel className="cursor-pointer">
+            Cancelar
+          </AlertDialogCancel>
+
+          <AlertDialogAction
+            onClick={salirGrupoFunc}
+            className="cursor-pointer"
+          >
+            Salir del grupo
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )}
+</div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -151,7 +286,7 @@ export default function GrupoPage({ params }: GrupoPageProps) {
                 grupoId={grupoIdNum}
                 onAsignaturaCreated={cargarDatos}
               >
-                <Button size="sm">
+                <Button size="sm" className="cursor-pointer">
                   <Plus className="mr-2 size-4" />
                   Nueva Asignatura
                 </Button>
@@ -200,7 +335,7 @@ export default function GrupoPage({ params }: GrupoPageProps) {
                   currentUserId={user.id}
                   onMiembrosUpdated={cargarDatos}
                   >
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full cursor-pointer">
                   <Users className="mr-2 size-4" />
                   Ver Miembros
                 </Button>

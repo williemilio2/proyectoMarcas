@@ -76,7 +76,7 @@ export function AppHeader() {
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
-      <SidebarTrigger className="-ml-1" />
+      <SidebarTrigger className="-ml-1 cursor-pointer" />
       <Separator orientation="vertical" className="mr-2 h-4" />
 
       <Breadcrumb className="flex-1">
@@ -100,7 +100,7 @@ export function AppHeader() {
 
       <div className="flex items-center gap-2">
         {currentRole && <RoleBadge role={currentRole} />}
-        <Button variant="ghost" size="icon" className="size-8">
+        <Button variant="ghost" size="icon" className="size-8 cursor-pointer" onClick={() => {alert("Producción, en un futuro añadiré esto..")}}>
           <Bell className="size-4" />
           <span className="sr-only">Notificaciones</span>
         </Button>

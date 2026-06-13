@@ -10,6 +10,7 @@ export async function obtenerRol(
       sql: `SELECT id_rol FROM rol_usuario WHERE id_usuario = ? AND id_grupo = ?`,
       args: [idUsuario, idGrupo],
     });
+    console.log( result.rows[0]?.id_rol)
     return result.rows[0]?.id_rol ?? null;
   } catch (error) {
     console.log(error);

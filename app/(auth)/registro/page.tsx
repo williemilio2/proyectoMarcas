@@ -21,6 +21,7 @@ import {
 export default function RegistroPage() {
   const router = useRouter()
   const [nombre, setNombre] = useState('')
+  const [mensajeBueno, setMensajeBueno] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -62,8 +63,7 @@ export default function RegistroPage() {
       setError(result.message)
       if(result.success)
       {
-        console.log("Mnesaje prueba");
-        router.push("/");
+        setMensajeBueno("Te hemos enviado un correo para verificar tu cuenta, aceptalo!");
       }
     } catch {
       setError('Error al crear la cuenta. Intenta de nuevo.')
@@ -127,7 +127,7 @@ export default function RegistroPage() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent cursor-pointer"
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={isLoading}
               >
@@ -156,7 +156,7 @@ export default function RegistroPage() {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4 mt-4">
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full cursor-pointer" disabled={isLoading}>
             {isLoading ? (
               <span className="flex items-center gap-2">
                 <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -169,6 +169,10 @@ export default function RegistroPage() {
               </span>
             )}
           </Button>
+          {mensajeBueno ? (
+            <p className="bg-green-200 border-l-4 border-green-600 text-green-900 px-4 py-3 rounded italic font-semibold shadow-sm">
+              {mensajeBueno}
+            </p>) : <p></p>}
           <p className="text-center text-sm text-muted-foreground">
             Ya tienes una cuenta?{' '}
             <Link

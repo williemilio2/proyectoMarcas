@@ -93,7 +93,7 @@ export function AppSidebar() {
                   <User className="size-4 text-muted-foreground" />
                   <span className="truncate text-sm">{user.email}</span>
                 </Link>*/}
-                <Link href="/" className="flex items-center gap-2">
+                <Link href="/perfil" className="flex items-center gap-2">
                   <User className="size-4 text-muted-foreground" />
                   <span className="truncate text-sm">{user.email}</span>
                 </Link>
@@ -128,7 +128,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Mis Grupos</SidebarGroupLabel>
           <GrupoCreateDialog>
-            <SidebarGroupAction title="Crear grupo">
+            <SidebarGroupAction title="Crear grupo" className='cursor-pointer'>
               <Plus className="size-4" />
               <span className="sr-only">Crear grupo</span>
             </SidebarGroupAction>
@@ -207,7 +207,7 @@ export function AppSidebar() {
                     <Users className="mr-2 size-4" />
                     Mi Perfil
                   </Link>*/}
-                  <Link href="/">
+                  <Link href="/perfil">
                     <Users className="mr-2 size-4" />
                     Mi Perfil
                   </Link>
