@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, LogIn } from 'lucide-react'
 import { loginUser } from "@/src/actions/login";
-import { useSearchParams } from "next/navigation";
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,6 +17,10 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 
+import { Suspense } from "react";
+import LoginMessage from "@/components/login-form";
+
+export const dynamic = 'force-dynamic'
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
@@ -25,9 +28,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const searchParams = useSearchParams();
-
-  const reset = searchParams.get("reset");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -132,11 +132,9 @@ export default function LoginPage() {
               </span>
             )}
           </Button>
-          {reset === "success" ? (
-            <p className="bg-green-200 border-l-4 border-green-600 text-green-900 px-4 py-3 rounded italic font-semibold shadow-sm">
-              Contraseña cambiada correctamente ✅
-            </p>
-          ) : <p></p>}
+            <Suspense fallback={null}>
+              <LoginMessage />
+            </Suspense>
           <p className="text-center text-sm text-muted-foreground">
             ¿Has olvidado tu contraseña?{' '}
             <Link
