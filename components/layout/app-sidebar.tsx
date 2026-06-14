@@ -170,67 +170,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                >
-                  <Avatar className="size-8 rounded-lg">
-                    <AvatarImage src={user?.avatar} alt={user?.nombre} />
-                    <AvatarFallback className="rounded-lg">
-                      {user ? getInitials(user.nombre) : 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      {user?.nombre || 'Usuario'}
-                    </span>
-                    <span className="truncate text-xs text-muted-foreground">
-                      {user?.email || 'email@ejemplo.com'}
-                    </span>
-                  </div>
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                side="top"
-                align="start"
-                sideOffset={4}
-              >
-                <DropdownMenuItem asChild>{/*
-                  <Link href="/perfil" href="/">
-                    <Users className="mr-2 size-4" />
-                    Mi Perfil
-                  </Link>*/}
-                  <Link href="/perfil">
-                    <Users className="mr-2 size-4" />
-                    Mi Perfil
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/configuracion">
-                    <Settings className="mr-2 size-4" />
-                    Configuracion
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  className="text-destructive"
-                  onClick={logout}
-                >
-                  <LogOut className="mr-2 size-4" />
-                  Cerrar Sesion
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
     </Sidebar>
   )
 }
